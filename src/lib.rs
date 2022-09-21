@@ -14,7 +14,7 @@ use std::{
   },
 };
 
-use tauri_hotkey_sys::*;
+use hotkey_soundboard::*;
 
 type GlobalListener = Lazy<Arc<Mutex<Listener>>>;
 type GlobalHotkeyMap =
@@ -237,70 +237,7 @@ pub fn parse_hotkey(hotkey_string: &str) -> Result<Hotkey> {
         shifted = true;
         key = Some(Key::KEY_9);
       }
-      ":" => {
-        shifted = true;
-        key = Some(Key::SEMICOLON);
-      }
-      "<" => {
-        shifted = true;
-        key = Some(Key::COMMA);
-      }
-      ">" => {
-        shifted = true;
-        key = Some(Key::PERIOD);
-      }
-      "_" => {
-        shifted = true;
-        key = Some(Key::MINUS);
-      }
-      "?" => {
-        shifted = true;
-        key = Some(Key::SLASH);
-      }
-      "~" => {
-        shifted = true;
-        key = Some(Key::OPENQUOTE);
-      }
-      "{" => {
-        shifted = true;
-        key = Some(Key::OPENBRACKET)
-      }
-      "|" => {
-        shifted = true;
-        key = Some(Key::BACKSLASH);
-      }
-      "}" => {
-        shifted = true;
-        key = Some(Key::CLOSEBRACKET);
-      }
-      "+" | "PLUS" => {
-        shifted = true;
-        key = Some(Key::EQUAL);
-      }
-      "\"" => {
-        shifted = true;
-        key = Some(Key::SINGLEQUOTE);
-      }
       _ => {}
-    }
-
-    // aliases
-    if key.is_none() {
-      key = match token.as_str() {
-        "RETURN" => Some(Key::ENTER),
-        "=" => Some(Key::EQUAL),
-        "-" => Some(Key::MINUS),
-        "'" => Some(Key::SINGLEQUOTE),
-        "," => Some(Key::COMMA),
-        "." => Some(Key::PERIOD),
-        ";" => Some(Key::SEMICOLON),
-        "/" => Some(Key::SLASH),
-        "`" => Some(Key::OPENQUOTE),
-        "[" => Some(Key::OPENBRACKET),
-        "\\" => Some(Key::BACKSLASH),
-        "]" => Some(Key::CLOSEBRACKET),
-        _ => None,
-      };
     }
 
     match key {
@@ -367,7 +304,6 @@ impl Hotkey {
 #[repr(u32)]
 pub enum Modifier {
   ALT = modifiers::ALT,
-  ALTGR = modifiers::ALT_GR,
   CTRL = modifiers::CONTROL,
   SHIFT = modifiers::SHIFT,
   SUPER = modifiers::SUPER,
@@ -402,45 +338,7 @@ pub enum Key {
   PRINTSCREEN = keys::PRINT_SCREEN,
   #[cfg(not(target_os = "macos"))]
   INSERT = keys::INSERT,
-  CLEAR = keys::CLEAR,
   DELETE = keys::DELETE,
-  SCROLLLOCK = keys::SCROLL_LOCK,
-  HELP = keys::HELP,
-  #[cfg(not(target_os = "macos"))]
-  NUMLOCK = keys::NUMLOCK,
-  // Media
-  VOLUMEMUTE = keys::VOLUME_MUTE,
-  VOLUMEDOWN = keys::VOLUME_DOWN,
-  VOLUMEUP = keys::VOLUME_UP,
-  #[cfg(not(target_os = "macos"))]
-  MEDIANEXTTRACK = keys::MEDIA_NEXT,
-  #[cfg(not(target_os = "macos"))]
-  MEDIAPREVIOUSTRACK = keys::MEDIA_PREV,
-  #[cfg(not(target_os = "macos"))]
-  MEDIASTOP = keys::MEDIA_STOP,
-  #[cfg(not(target_os = "macos"))]
-  MEDIAPLAYPAUSE = keys::MEDIA_PLAY_PAUSE,
-  #[cfg(not(target_os = "macos"))]
-  LAUNCHMAIL = keys::LAUNCH_MAIL,
-  // F1-F12
-  F1 = keys::F1,
-  F2 = keys::F2,
-  F3 = keys::F3,
-  F4 = keys::F4,
-  F5 = keys::F5,
-  F6 = keys::F6,
-  F7 = keys::F7,
-  F8 = keys::F8,
-  F9 = keys::F9,
-  F10 = keys::F10,
-  F11 = keys::F11,
-  F12 = keys::F12,
-  // Numpad
-  NUMADD = keys::ADD,
-  NUMSUB = keys::SUBTRACT,
-  NUMMULT = keys::MULTIPLY,
-  NUMDIV = keys::DIVIDE,
-  NUMDEC = keys::DECIMAL,
   #[serde(rename = "0")]
   KEY_0 = keys::KEY_0,
   #[serde(rename = "1")]
@@ -487,28 +385,6 @@ pub enum Key {
   X = keys::X,
   Y = keys::Y,
   Z = keys::Z,
-  #[serde(rename = "=")]
-  EQUAL = keys::EQUAL,
-  #[serde(rename = "-")]
-  MINUS = keys::MINUS,
-  #[serde(rename = "'")]
-  SINGLEQUOTE = keys::SINGLE_QUOTE,
-  #[serde(rename = ",")]
-  COMMA = keys::COMMA,
-  #[serde(rename = ".")]
-  PERIOD = keys::PERIOD,
-  #[serde(rename = ";")]
-  SEMICOLON = keys::SEMICOLON,
-  #[serde(rename = "/")]
-  SLASH = keys::SLASH,
-  #[serde(rename = "`")]
-  OPENQUOTE = keys::OPEN_QUOTE,
-  #[serde(rename = "[")]
-  OPENBRACKET = keys::OPEN_BRACKET,
-  #[serde(rename = "\\")]
-  BACKSLASH = keys::BACK_SLASH,
-  #[serde(rename = "]")]
-  CLOSEBRACKET = keys::CLOSE_BRACKET,
 }
 
 impl fmt::Display for Key {
@@ -600,13 +476,13 @@ mod tests {
       }
     );
     assert_eq!(
-      parse_hotkey("SUPER+CTRL+SHIFT+AltGr+9").unwrap(),
+      parse_hotkey("SUPER+CTRL+SHIFT+Alt+9").unwrap(),
       Hotkey {
         modifiers: vec![
           Modifier::SUPER,
           Modifier::CTRL,
           Modifier::SHIFT,
-          Modifier::ALTGR
+          Modifier::ALT
         ],
         keys: vec![Key::KEY_9]
       }
